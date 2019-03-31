@@ -1,6 +1,8 @@
 const Koa = require('koa')
+const fs = require('fs')
 const path = require('path')
-const bodyParser = require('koa-bodyparser')
+const staticCache = require('koa-static-cache')
+const koaBody = require('koa-body')
 const cors = require('koa2-cors')
 const helmet = require('koa-helmet')
 const log4js = require('log4js')
@@ -58,6 +60,9 @@ app.use(async (ctx, next) => {
   }
 })
 
+// 静态资源
+app.use(staticCache(path.join(__dirname, './static'), { dynamic: true }))
+
 // session 存入 mysql 
 app.use(session({
   key: 'SESSION_ID',
@@ -65,7 +70,8 @@ app.use(session({
 }))
 
 // 解析 post
-app.use(bodyParser({
+app.use(koaBody({
+  multipart: true, 
   formLimit: '1mb'
 }))
 
@@ -77,6 +83,20 @@ app.use(ctx => {
   ctx.body = '无效的 url'
   app.emit('error', '无效的 url', ctx)
 })
+
+// 判断 static 目录是否存在，不存在则新建。static 目录用于上传文件
+let pathStatic = path.join(__dirname, './static')
+fs.stat(pathStatic, (err, stats) => {
+  if (err) {
+    // 不存在
+    fs.mkdir(pathStatic, err => {
+      if (err) {
+        console.log(err)
+      } 
+    })
+  }
+})
+
 
 app.listen(port, () => {
   console.log('http://localhost:' + port)

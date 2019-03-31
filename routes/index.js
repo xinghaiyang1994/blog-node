@@ -16,7 +16,7 @@ module.exports = function (app) {
     })
 
     // 子路由
-    router.use('/home', require('./home').routes())
+    router.use('/common', require('./common').routes())
     router.use('/user', require('./user').routes())
 
     app.use(router.routes())
