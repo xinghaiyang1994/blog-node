@@ -1,13 +1,9 @@
 const fs =require('fs')
 const path =require('path')
+const svgCaptcha = require('svg-captcha')
 const tools = require('../utils/tools')
 
 module.exports = {
-    async getHome (ctx) {
-        await ctx.render('index', {
-            content: 'home'
-        })
-    },
     async postUpload (ctx) {
       // 获取字段为 file 的上传文件
       let file =  ctx.request.files.file
@@ -38,5 +34,11 @@ module.exports = {
           fileUrl: newFileName
         }
       })
-    }
+    },
+    getCaptcha (ctx) {
+      const captcha = svgCaptcha.create()
+      ctx.session.captcha = captcha.text.toLowerCase()
+      ctx.response.set('Content-Type', 'image/svg+xml')
+      ctx.body = String(captcha.data)
+  },
 }
