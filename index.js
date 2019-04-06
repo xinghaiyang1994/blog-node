@@ -66,7 +66,10 @@ app.use(staticCache(path.join(__dirname, './static'), { dynamic: true }))
 // session 存入 mysql 
 app.use(session({
   key: 'SESSION_ID',
-  store
+  store,
+  cookie: {
+    maxAge: 2 * 60 * 60 * 1000    // 2小时过期
+  }
 }))
 
 // 解析 post

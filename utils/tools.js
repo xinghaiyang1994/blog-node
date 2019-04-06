@@ -13,5 +13,16 @@ module.exports = {
       }
     }
     return false
+  },
+  filterXSS (str) {
+    str = str + ''
+    return str.replace(/[<>"']/g, target => {       /* 特殊符号过滤 */
+      return {
+        '<': '&lt;',
+        '"': '&quot;',
+        '>': '&gt;',
+        "'": '&#39;'
+      }[target]
+    })
   }
 }

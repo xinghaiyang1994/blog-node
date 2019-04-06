@@ -8,6 +8,6 @@ router.post('/login', require('../controller/user').postLogin)
 // 获取登录信息
 router.get('/info', require('../controller/user').getInfo)
 // 退出
-router.get('/logout', require('../controller/user').getLogout)
+router.post('/logout', require('../controller/user').postLogout)
 
 module.exports = router

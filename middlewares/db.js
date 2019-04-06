@@ -7,6 +7,6 @@ const knex = require('knex')({
 
 const db = require('bookshelf')(knex)
 
-db.plugin(['pagination', 'visibility', 'bookshelf-camelcase'])
+db.plugin(['pagination', 'virtuals', 'visibility', 'bookshelf-camelcase'])
 
 module.exports = db

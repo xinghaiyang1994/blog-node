@@ -4,7 +4,10 @@ const Joi = require('joi')
 
 module.exports = (value, schema, options = {}) => {
   options.language = language
-  return Joi.validate(value, schema, options).catch(err => {
-    throw err;
+  return Joi.validate(value, schema, options, err => {
+    if (err) {
+      console.log('校验格式错误', err.details)
+      throw new Error(err.details[0].message)
+    }
   })
 }

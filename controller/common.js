@@ -1,7 +1,10 @@
 const fs =require('fs')
 const path =require('path')
 const svgCaptcha = require('svg-captcha')
-const tools = require('../utils/tools')
+const {
+  arrIn,
+  dealBody
+} = require('../utils/tools')
 
 module.exports = {
     async postUpload (ctx) {
@@ -9,7 +12,7 @@ module.exports = {
       let file =  ctx.request.files.file
       console.log(file)
       // 校验图片格式
-      if (!tools.arrIn(file.type, ['image/png', 'image/jpeg', 'image/gif'])) {
+      if (!arrIn(file.type, ['image/png', 'image/jpeg', 'image/gif'])) {
         throw new Error('只能上传 png、jpeg、jpg、gif 格式的图片！')
       }
       // 校验大小
@@ -29,14 +32,16 @@ module.exports = {
         })  
       })
 
-      ctx.body = tools.dealBody({
+      ctx.body = dealBody({
         data: {
           fileUrl: newFileName
         }
       })
     },
     getCaptcha (ctx) {
-      const captcha = svgCaptcha.create()
+      const captcha = svgCaptcha.create({
+        ignoreChars: '0o1i'
+      })
       ctx.session.captcha = captcha.text.toLowerCase()
       ctx.response.set('Content-Type', 'image/svg+xml')
       ctx.body = String(captcha.data)

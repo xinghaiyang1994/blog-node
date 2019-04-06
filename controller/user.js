@@ -1,90 +1,98 @@
 const md5 = require('md5')
-const moment = require('moment')
-
-const tools = require('../utils/tools')
-const { checkLogin } = require('../middlewares/check')
-const { 
-    findUserByName,
-    insertUser
-} = require('../models')
-
-// 新增
+const {
+  dealBody
+} = require('../utils/tools')
 const validate = require('../utils/validate')
+const {
+  register,
+  login 
+} = require('../utils/joiSchema')
+const {
+  findUserByName,
+  insertUser,
+  findUserById
+} = require('../dao/user')
 
 module.exports = {
   async postRegister (ctx) {
-    validate()
-  },
-    // async postRegister (ctx) {
-    //     const { name, password, repeat } = ctx.request.body
-    //     if ((name + '').trim() === '' || (password + '').trim() === '' || (repeat + '').trim() === '') {
-    //         throw new Error('用户名或密码不能为空!')
-    //     }
-    //     if (password !== repeat) {
-    //         throw new Error('两次密码应该相同!')
-    //     }
-    //     await findUserByName(name).then(res => {
-    //         if (res.length > 0) {
-    //             throw new Error('用户存在!')
-    //         }
-    //     })
-    //     await insertUser([name, md5(password), moment().format('YYYY-MM-DD HH:mm:ss')]).then(res => {
-    //         if (res) {
-    //             ctx.body = tools.dealBody({
-    //                 message: '注册成功。'
-    //             })
-    //         } else {
-    //             throw new Error('后台服务错误!')
-    //         }
-    //     })
-    // },
+    let { name, password, repeatPassword, avator } = ctx.request.body
+    name = name.trim()
 
-
-
-
-    async postLogin (ctx) {
-        const { name, password, captcha } = ctx.request.body, sCaptcha = ctx.session.captcha
-        if ((name + '').trim() === '' || (password + '').trim() === '' || (captcha + '').trim() === '') {
-            throw new Error('用户名或密码或验证码不能为空!')
-        }
-        if (captcha.toLowerCase() !== sCaptcha) {
-            throw new Error('验证码错误!')
-        }
-        await findUserByName(name).then(res => {
-            if (res.length === 0) {
-                throw new Error('用户不存在!')
-            }
-            if (md5(password) !== res[0].password) {
-                throw new Error('密码不正确!')
-            } else {
-                ctx.session = {
-                    id: res[0].id,
-                    name: res[0].name
-                }
-                ctx.body = tools.dealBody({
-                    message: '登录成功。'
-                })
-            }
-        })
-
-    },
-    async getInfo (ctx) {
-        checkLogin(ctx)
-        const { name } = ctx.session
-        await findUserByName(name).then(res => {
-            if (res.length > 0) {
-                ctx.body = tools.dealBody({
-                    data: res[0]
-                })
-            } else {
-                throw new Error('用户不存在!')
-            }
-        })
-    },
-    async getLogout (ctx) {
-        ctx.session = null
-        ctx.body = tools.dealBody({
-            data: '退出成功。'
-        })
+    // 校验
+    validate({ name, password, repeatPassword, avator }, register)
+    if (password !== repeatPassword) {
+      throw new Error('两次密码应该相同!')
     }
+    let sameUser = await findUserByName(name) 
+    if (sameUser) {
+      throw new Error('用户名已存在!')
+    }
+
+    // 新增用户
+    let resUser = await insertUser({ name, password: md5(password), avator })
+    return ctx.body = dealBody({
+      data: {
+        id: resUser.get('id')
+      },
+      message: '注册成功'
+    })
+  },
+  async postLogin (ctx) {
+    let { name, password, captcha } = ctx.request.body
+    let sCaptcha = ctx.session.captcha
+    name = name.trim()
+
+    // 校验
+    validate({ name, password, captcha }, login)
+    if (captcha !== sCaptcha) {
+      throw new Error('验证码错误!')
+    }
+    let existUser = await findUserByName(name)
+    if (!existUser) {
+      throw new Error('用户不存在!')
+    } 
+    if (md5(password) !== existUser.get('password')) {
+      throw new Error('密码不正确!')
+    }
+
+    // 登录
+    ctx.session = {
+      id: existUser.id
+    }
+    return ctx.body = dealBody({
+      message: '登录成功'
+    })
+  },
+  async getInfo (ctx) {
+    const { id } = ctx.session
+
+    // 校验
+    if (typeof id === 'undefined') {
+      return ctx.body = dealBody({
+        data: {},
+        message: '暂未登录'
+      })
+    }
+    let existUser = await findUserById(id)
+    if (!existUser) {
+      return ctx.body = dealBody({
+        data: {},
+        message: '用户不存在'
+      })
+    }
+
+    return ctx.body = dealBody({
+      data: {
+        id: existUser.get('id'),
+        name: existUser.get('name')
+      }
+    })
+  },
+  postLogout (ctx) {
+    ctx.session = {}
+    return ctx.body = dealBody({
+      data: {},
+      message: '退出成功'
+    })
+  }
 }

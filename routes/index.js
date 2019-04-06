@@ -16,8 +16,12 @@ module.exports = function (app) {
     })
 
     // 子路由
+    // 通用
     router.use('/common', require('./common').routes())
+    // 用户
     router.use('/user', require('./user').routes())
+    // 文章
+    router.use('/post', require('./post').routes())
 
     app.use(router.routes())
     app.use(router.allowedMethods())
