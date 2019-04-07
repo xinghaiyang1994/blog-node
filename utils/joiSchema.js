@@ -26,5 +26,11 @@ module.exports = {
     id: Joi.number().required(),
     title: Joi.string().max(40).required(),
     md: Joi.string().required()
+  },
+  // 发表评论
+  comment: {
+    content: Joi.string().required(),
+    postId: Joi.number().required(),
+    userId: Joi.number().required()
   }
 }

@@ -5,9 +5,11 @@ module.exports = {
   insertPost (model) {
     return Post.forge(model).save()
   },
+  // 获取所有文章数量
   findPostAllCount () {
     return Post.forge().count()
   },
+  // 获取所有文章列表（翻页）
   findPostAllPage ({ page, pageSize }) {
     return Post.forge().orderBy('gmt_modified', 'DESC').fetchPage({
       page, 
@@ -21,9 +23,11 @@ module.exports = {
       ]
     })
   },
+  // 获取单个人的所有文章数量
   findPostAllCountByUserId (userId) {
     return Post.forge().where({ user_id: userId }).count()
   },
+  // 获取单个人的文字列表（翻页）
   findPostAllPageByUserId ({ page, pageSize, userId }) {
     return Post.forge().where({ user_id: userId }).orderBy('gmt_modified', 'DESC').fetchPage({
       page, 
@@ -37,6 +41,7 @@ module.exports = {
       ]
     })
   },
+  // 获取单个文章详情
   findPostDetailById (id) {
     return Post.forge().where({ id }).fetch({
       withRelated: [
@@ -48,31 +53,22 @@ module.exports = {
       ]
     })
   },
+  // 更新单个文章的 pv
   updatePvById ({ id, pv}) {
     // TODO 还可以一条 sql
     return Post.forge({ id }).save({ pv })
   },
+  // 更新单个文章的评论数
+  updateCommentsById ({ id, comments}) {
+    // TODO 还可以一条 sql
+    return Post.forge({ id }).save({ comments })
+  },
+  // 删除单个文章
   deletePostById (id) {
     return Post.forge().where({ id }).destroy()
   },
+  // 更新单个文章
   updatePost ({ id, title, md, content, gmtModified }) {
     return Post.forge({ id }).save({ title, md, content, gmtModified })
   }
-
-
-
-
-
-  // // 通过名称查找用户
-  // findUserByName (name) {
-  //   return User.forge().where({
-  //     name
-  //   }).fetch()
-  // },
-  // // 通过 id 查找用户
-  // findUserById (id) {
-  //   return User.forge().where({
-  //     id
-  //   }).fetch()
-  // }
 }
