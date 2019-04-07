@@ -49,6 +49,9 @@ module.exports = {
     // 查询
     let total = await findCommentCountByPostId(postId)
     let list = await findCommentPageByPostId({ postId, page: current, pageSize })
+    list.forEach(el => {
+      el.set('gmtModified', moment(el.get('gmtModified')).toDate().getTime())
+    })
     return ctx.body = dealBody({
       data: {
         list,

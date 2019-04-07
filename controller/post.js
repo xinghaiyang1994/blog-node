@@ -1,7 +1,8 @@
 const marked = require('marked')
 const moment = require('moment')
 const {
-  dealBody
+  dealBody,
+  filterXSS
 } = require('../utils/tools')
 const validate = require('../utils/validate')
 const {
@@ -37,7 +38,7 @@ module.exports = {
     validate({title, md, userId}, postAdd)
 
     // 新增
-    // let content = filterXSS(marked(md))
+    md = filterXSS(md)
     let content = marked(md)
     let resPost = await insertPost({title, md, content, userId})
     return ctx.body = dealBody({
@@ -57,7 +58,7 @@ module.exports = {
       pageSize
     })
     list.forEach(el => {
-      el.set('gmtModified', moment(el.gmtModified).toDate().getTime())
+      el.set('gmtModified', moment(el.get('gmtModified')).toDate().getTime())
     })
     return ctx.body = dealBody({
       data: {
