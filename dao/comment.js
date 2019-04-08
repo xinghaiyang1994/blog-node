@@ -15,7 +15,7 @@ module.exports = {
   findCommentPageByPostId ({ postId, page, pageSize }) {
     return Comment.forge().where({
       post_id: postId
-    }).fetchPage({
+    }).orderBy('gmt_modified').fetchPage({
       page, 
       pageSize,
       withRelated: [
