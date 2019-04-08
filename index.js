@@ -7,17 +7,17 @@ const cors = require('koa2-cors')
 const helmet = require('koa-helmet')
 const log4js = require('log4js')
 const session = require('koa-session-minimal')
-const MysqlSession = require('koa-mysql-session')
+const redisStore = require('koa-redis')
 
 const routes = require('./routes')
 const {
-  database,
+  rdb,
   port
 } = require('./config/default')
 
 const app = new Koa()
 const logger = log4js.getLogger()
-let store = new MysqlSession(database)
+let store = redisStore(rdb)
 
 log4js.configure({
   appenders: {
