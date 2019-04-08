@@ -22,8 +22,8 @@ let store = new MysqlSession(database)
 log4js.configure({
   appenders: {
     error: { // 定义了名为 error 的 appender 
-      type: 'file',
-      filename: path.join(__dirname, './log/error.log')
+      type: 'datefile',   // 按天记录日志
+      filename: path.join(__dirname, `./log/error.log`)
     }
   },
   categories: {
