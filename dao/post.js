@@ -10,8 +10,8 @@ module.exports = {
     return Post.forge().count()
   },
   // 获取所有文章列表（翻页）
-  findPostAllPage ({ page, pageSize }) {
-    return Post.forge().orderBy('gmt_modified', 'DESC').fetchPage({
+  async findPostAllPage ({ page, pageSize }) {
+    return await Post.forge().orderBy('gmt_modified', 'DESC').fetchPage({
       page, 
       pageSize,
       withRelated: [
