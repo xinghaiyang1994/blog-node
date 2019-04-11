@@ -2,7 +2,9 @@ const config = require('../config/default')
 
 const knex = require('knex')({
   client: 'mysql',
-  connection: config.database
+  debug: true,
+  connection: config.database,
+  pool: { min: 10, max: 30 }
 })
 
 const db = require('bookshelf')(knex)
