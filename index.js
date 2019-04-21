@@ -60,10 +60,6 @@ app.use(async (ctx, next) => {
   }
 })
 
-process.on('uncaughtException', err => {
-    logger.error(`Unexpected exception: ${err.message}`)
-})
-
 // 静态资源
 app.use(staticCache(path.join(__dirname, './static'), { dynamic: true }))
 
