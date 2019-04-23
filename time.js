@@ -32,14 +32,14 @@ async function job () {
       pageSize: 10
     }
   }).catch(err => {
-    let log = `catch:${err.message}`
+    let log = `catch|${(new Date()).toLocaleString()}|${err.message}`
     logToFile(fPath, log)
   })
   if (!resData) {
     return 
   }
   if (resData.code !== 0) {
-    let log = `then:${resData.message}`
+    let log = `then|${(new Date()).toLocaleString()}|${resData.message}`
     logToFile(fPath, log)
   }
 }
