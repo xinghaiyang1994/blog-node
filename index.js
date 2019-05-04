@@ -9,6 +9,9 @@ const log4js = require('log4js')
 const session = require('koa-session-minimal')
 const redisStore = require('koa-redis')
 
+// 定时请求
+require('./time')
+
 const routes = require('./routes')
 const {
   rdb,
