@@ -20,8 +20,7 @@ function logToFile (fPath, log) {
     } 
     existFile[fPath] = true
   }
-  let old = fs.readFileSync(fPath)
-  fs.writeFileSync(fPath, old.toString() + log + '\n')
+  fs.appendFileSync(fPath, log + '\n')
 }
 async function job () {
   let resData = await axios({
